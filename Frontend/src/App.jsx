@@ -1,12 +1,23 @@
 import React from 'react'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import AppLayout from './layouts/AppLayout'
+import LandingPage from './pages/LandingPage'
+
+const router = createBrowserRouter([
+  {
+    element : <AppLayout/>,
+    children : [
+      {
+        path : '/',
+        element : <LandingPage/>
+      },
+    ],
+  }
+])
 
 const App = () => {
   return (
-    <>
-      <div className='text-green-400 m-5 bg-black'>
-        App
-      </div>
-    </>
+    <RouterProvider router={router} />
   )
 }
 
