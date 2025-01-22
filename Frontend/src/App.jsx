@@ -11,8 +11,8 @@ import { Profile } from './pages/profile/Profile'
 // Route Guards
 const ProtectedRoute = () => {
   const token = localStorage.getItem('token'); // Correct method to retrieve token
-
-  if (!token) {
+  const user = localStorage.getItem('user'); // Correct method to retrieve user
+  if (!token && !user) {
     return <Navigate to="/sign-in" />; // Redirect to sign-in if no token exists
   }
 
@@ -21,11 +21,6 @@ const ProtectedRoute = () => {
 
 
 
-const PublicRoute = () => {
-  const user = localStorage.getItem('user');
-  if (user) return <Navigate to="/dashboard" />;
-  return <Outlet />;
-};
 
 
 
@@ -36,20 +31,19 @@ const router = createBrowserRouter([
       {
         path: '/',
         element: <LandingPage />  // Always accessible
+        
       },
+
       {
-        element: <PublicRoute />,  // Only for non-logged in users
-        children: [
-          {
-            path: '/sign-in',
-            element: <SignIn />
-          },
-          {
-            path: '/sign-up',
-            element: <SignUp />
-          }
-        ]
+        path: '/sign-in',
+        element: <SignIn />
       },
+
+      {
+        path: '/sign-up',
+        element: <SignUp />
+      },
+      
       {
         element: <ProtectedRoute />,  // Only for logged in users
         children: [

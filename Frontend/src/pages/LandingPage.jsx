@@ -7,15 +7,17 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-black">
       {/* Navigation */}
-      <nav className="flex justify-between items-center p-4 max-w-7xl mx-auto">
+      <nav className="flex justify-between items-center p-4 max-w-7xl mx-auto ">
         <div className="text-xl font-bold">Logo</div>
-        <div className="hidden md:flex space-x-6">
+        
+        <div className="hidden md:flex space-x-6  ">
           <Link to="/about-us" className="text-gray-400 py-2">About us</Link>
           <Link to="/sign-in">
           <Button className="px-4 py-2 bg-white text-black rounded-md border border-gray-300 hover:bg-gray-400 transition">Login</Button>
 
           </Link>
         </div>
+
       </nav>
 
       {/* Hero Section */}

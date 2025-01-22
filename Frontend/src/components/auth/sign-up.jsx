@@ -61,8 +61,8 @@ const SignUp = () => {
         email: result.user.email,
         displayName: result.user.displayName,
       };
-      localStorage.setItem("user", JSON.stringify(userData));
-
+      localStorage .setItem("user", JSON.stringify(userData));
+      
       toast.success("Successfully signed in with Google!");
       navigate("/dashboard"); // Redirect to a suitable page
     } catch (error) {
