@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useContext} from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,25 +9,55 @@ import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from "@/config/firebase";
 import { toast } from "sonner";
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+import { UserDataContext } from "../../context/UserContext";
+
 
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const[userData,setUserData]=useState({});
 
   const navigate = useNavigate();
+    const { user,setUser } = useContext(UserDataContext);
+  
 
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    setError("");
+  
 
     if (!email || !password) {
-      setError("Please fill in all fields");
+      alert("Please fill in all fields");
       return;
     }
+    setUserData({
+      email:email,
+      password:password
+    })
+    //console.log("hi",)
+    console.log(userData)
+   // console.log("Sign In submitted:", userData);
+   // navigate('/dashboard');
+   try {
+    const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/auth/login`, {
+      email,
+      password,
+    });
+    console.log("hello",response)
 
-    console.log("Sign In submitted:", { email, password });
+    if (response.status === 200) {
+      const { data } = response;
+      setUser(data); // Set user context
+      toast.success("Login Sucessful!");
+      localStorage.setItem("token", data.token);
+      navigate("/dashboard");
+    }
+  } catch (error) {
+    console.error("Error during login:", error.response?.data || error.message);
+    toast.error(error.response?.data?.message || "Login failed.");
+  }
   };
 
   const handleGoogleSignIn = async () => {
@@ -81,12 +111,8 @@ const SignIn = () => {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <Alert variant="destructive" className="border-red-500/50 bg-red-500/10 text-red-400">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+        <form onSubmit={(e)=>{handleSubmit(e)}} className="space-y-4">
+          
 
           <div className="space-y-2">
             <Label htmlFor="email" className="text-gray-200">Email</Label>

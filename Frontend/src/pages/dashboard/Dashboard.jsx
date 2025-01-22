@@ -11,7 +11,7 @@ const Dashboard = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      localStorage.removeItem('user');
+      localStorage.removeItem('token');
       toast.success('Logged out successfully');
       navigate('/');
     } catch (error) {

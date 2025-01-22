@@ -3,10 +3,10 @@ const authService = require('../services/authService');
 const {validationResult} = require('express-validator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const config = require('../config/env');
+const dotenv=require('dotenv')
 
 const generateToken = (userId) => {
-    return jwt.sign({ id: userId }, config.JWT_SECRET, {
+    return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
         expiresIn: '30d'
     });
 };

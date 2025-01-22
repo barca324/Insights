@@ -1,75 +1,91 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Link } from "react-router-dom";
+import { auth } from "@/config/firebase";
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
+import { toast } from "sonner";
+import axios from "axios";
+import { UserDataContext } from "../../context/UserContext";
 
 const SignUp = () => {
+  const [name,setName]=useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const { user,setUser } = useContext(UserDataContext);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
 
-    if (!email || !password || !confirmPassword) {
-      setError("Please fill in all fields");
+    if (!name || !email || !password || !confirmPassword) {
+      toast.error("Please fill in all fields.");
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      toast.error("Passwords do not match.");
       return;
     }
 
-    console.log("Sign Up submitted:", { email, password });
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/auth/register`, {
+        name,
+        email,
+        password,
+      });
+
+      if (response.status === 201) {
+        const { data } = response;
+        setUser(data); // Set user context
+        toast.success("Signup Successful!");
+        localStorage.setItem("token", data.token);
+        navigate("/sign-in");
+      }
+    } catch (error) {
+      console.error("Error during signup:", error.response?.data || error.message);
+      toast.error(error.response?.data?.message || "Signup failed.");
+    }
   };
 
-  // const handleGoogleSignUp = async () => {
-  //   try {
-  //     const provider = new GoogleAuthProvider();
+  const handleGoogleSignUp = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
 
-  //     const result = await signInWithPopup(auth, provider);
+      const userData = {
+        uid: result.user.uid,
+        email: result.user.email,
+        displayName: result.user.displayName,
+      };
+      localStorage.setItem("user", JSON.stringify(userData));
 
-  //      // Store user data
-  //      localStorage.setItem('user', JSON.stringify({
-  //       uid: result.user.uid,
-  //       email: result.user.email,
-  //       displayName: result.user.displayName
-  //     }));
-  //     console.log("Google sign-in successful:", result.user);
-  //     toast.success("Successfully signed in with Google!");
-  //     navigate('/dashboard');
-  //   } catch (error) {
-  //     console.error("Google sign-in error:", error);
-  //     toast.error("Failed to sign in with Google");
-  //   }
-  // };
+      toast.success("Successfully signed in with Google!");
+      navigate("/dashboard"); // Redirect to a suitable page
+    } catch (error) {
+      console.error("Google sign-in error:", error);
+      toast.error("Failed to sign in with Google.");
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white p-4">
       <div className="w-full max-w-md space-y-8">
-        {/* Header */}
         <div className="text-center space-y-2">
-          <h2 className="text-3xl font-bold text-white">Create an account</h2>
+          <h2 className="text-3xl font-bold">Create an account</h2>
           <p className="text-sm text-gray-400">Enter your email to create your account</p>
         </div>
-
-        {/* Google Auth Button */}
         <Button
           variant="outline"
-          className="w-full border-gray-800 bg-black text-white hover:bg-gray-900 hover:text-white"
+          className="w-full border-gray-800 bg-black text-white hover:bg-gray-900"
           onClick={handleGoogleSignUp}
         >
           <FcGoogle className="mr-2 h-4 w-4" />
           Continue with Google
         </Button>
-
-        {/* Divider */}
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t border-gray-800" />
@@ -78,15 +94,18 @@ const SignUp = () => {
             <span className="bg-black px-2 text-gray-400">Or continue with email</span>
           </div>
         </div>
-
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <Alert variant="destructive" className="border-red-500/50 bg-red-500/10 text-red-400">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
+        <div className="space-y-2">
+            <Label htmlFor="email" className="text-gray-200">Name</Label>
+            <Input
+              id="name"
+              type="name"
+              placeholder="your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="border-gray-800 bg-gray-900/50 text-white placeholder:text-gray-500 focus:border-gray-600"
+            />
+          </div>
           <div className="space-y-2">
             <Label htmlFor="email" className="text-gray-200">Email</Label>
             <Input
@@ -95,10 +114,9 @@ const SignUp = () => {
               placeholder="name@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="border-gray-800 bg-gray-900/50 text-white placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600"
+              className="border-gray-800 bg-gray-900/50 text-white placeholder:text-gray-500 focus:border-gray-600"
             />
           </div>
-
           <div className="space-y-2">
             <Label htmlFor="password" className="text-gray-200">Password</Label>
             <Input
@@ -107,10 +125,9 @@ const SignUp = () => {
               placeholder="Create a password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="border-gray-800 bg-gray-900/50 text-white placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600"
+              className="border-gray-800 bg-gray-900/50 text-white placeholder:text-gray-500 focus:border-gray-600"
             />
           </div>
-
           <div className="space-y-2">
             <Label htmlFor="confirmPassword" className="text-gray-200">Confirm Password</Label>
             <Input
@@ -119,19 +136,17 @@ const SignUp = () => {
               placeholder="Confirm your password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="border-gray-800 bg-gray-900/50 text-white placeholder:text-gray-500 focus:border-gray-600 focus:ring-gray-600"
+              className="border-gray-800 bg-gray-900/50 text-white placeholder:text-gray-500 focus:border-gray-600"
             />
           </div>
-
           <Button type="submit" className="w-full bg-white text-black hover:bg-gray-200">
             Sign Up
           </Button>
-
           <div className="text-center text-sm text-gray-400 mt-4">
-            Already have an account?{' '}
+            Already have an account?{" "}
             <Link
               to="/sign-in"
-              className="text-white font-semibold hover:text-gray-300 transition-colors duration-200"
+              className="text-white font-semibold hover:text-gray-300"
             >
               Sign In
             </Link>

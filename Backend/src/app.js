@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const config = require('./config/env');
+
 const connectDB = require('./config/database');
 const errorHandler = require('./middleware/error');
 

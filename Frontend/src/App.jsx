@@ -10,10 +10,16 @@ import { Profile } from './pages/profile/Profile'
 
 // Route Guards
 const ProtectedRoute = () => {
-  const user = localStorage.getItem('user');
-  if (!user) return <Navigate to="/sign-in" />;
-  return <Outlet />;
+  const token = localStorage.getItem('token'); // Correct method to retrieve token
+
+  if (!token) {
+    return <Navigate to="/sign-in" />; // Redirect to sign-in if no token exists
+  }
+
+  return <Outlet />; // Render child routes if token exists
 };
+
+
 
 const PublicRoute = () => {
   const user = localStorage.getItem('user');
