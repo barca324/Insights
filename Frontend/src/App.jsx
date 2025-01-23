@@ -6,6 +6,8 @@ import SignIn from './components/auth/sign-in'
 import SignUp from './components/auth/sign-up'
 import { Toaster } from "sonner";
 import Dashboard from './pages/dashboard/Dashboard'
+import Instagram from './pages/Instagram'
+import X from './pages/X'
 import { Profile } from './pages/profile/Profile'
 
 // Route Guards
@@ -54,6 +56,12 @@ const router = createBrowserRouter([
           {
             path: '/profile',
             element: <Profile />
+          },{
+            path:'/instagram',
+            element:<Instagram/>
+          },{
+            path:'/twitter',
+            element:<X/>
           }
         ]
       },

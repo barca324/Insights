@@ -49,7 +49,8 @@ const SignIn = () => {
 
     if (response.status === 200) {
       const { data } = response;
-      setUser(data); // Set user context
+      console.log("data",data);
+      setUser({email:data.user.email,name:data.user.name}); // Set user context
       toast.success("Login Sucessful!");
       localStorage.setItem("token", data.token);
       navigate("/dashboard");
@@ -73,6 +74,9 @@ const SignIn = () => {
         displayName: result.user.displayName
       }));
       console.log("Google sign-in successful:", result.user);
+      console.log(result.user.email)
+      console.log(result.user.displayName)
+      setUser({email:result.user.email,name:result.user.displayName})
       toast.success("Successfully signed in with Google!");
       navigate('/dashboard');
     } catch (error) {
