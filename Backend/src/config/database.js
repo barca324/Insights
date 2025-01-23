@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
 // Load environment variables
-dotenv.config();
+dotenv.config(); 
 
 const connectDB = async () => {
     try {
@@ -18,4 +18,4 @@ const connectDB = async () => {
     }
 };
 
-module.exports = connectDB;
+module.exports = connectDB; 
